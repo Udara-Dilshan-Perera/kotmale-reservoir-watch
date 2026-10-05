@@ -1,0 +1,13 @@
+{
+  "_note": "Fill in lat and lon for each catchment. These are the same coordinates used to download the historical rainfall from Open-Meteo (they are normally listed in the first lines of each downloaded CSV). Leave a catchment as null to skip it.",
+  "ambewela_rain_mm":           {"lat": null, "lon": null},
+  "campion_estate_rain_mm":     {"lat": null, "lon": null},
+  "hellboda_north_rain_mm":     {"lat": null, "lon": null},
+  "holmwood_estate_rain_mm":    {"lat": null, "lon": null},
+  "hope_estate_rain_mm":        {"lat": 7.110330, "lon": 80.745250},
+  "nuwara_eliya_rain_mm":       {"lat": null, "lon": null},
+  "oonoogaloya_estate_rain_mm": {"lat": null, "lon": null},
+  "sandrigham_rain_mm":         {"lat": null, "lon": null},
+  "talawakelle_rain_mm":        {"lat": null, "lon": null},
+  "watawala_rain_mm":           {"lat": null, "lon": null}
+}

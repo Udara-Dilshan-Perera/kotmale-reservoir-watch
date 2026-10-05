@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kotmale Reservoir Watch — Model &amp; Method</title>
+<link rel="stylesheet" href="styles.css?v=2">
+<script src="vendor/chart.umd.min.js"></script>
+<script>window.Chart || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"><\/script>')</script>
+<style>
+
+.step h4 {
+  margin-top: 2px !important;    
+  margin-bottom: 6px !important;
+  line-height: 1.3 !important;
+}
+
+
+.step .n {
+  margin-top: 0 !important;
+  align-self: start;
+}
+
+
+.step:not(:last-child)::before {
+  top: 32px !important;        
+}
+
+body {
+  background-color: #FFFFFF !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;
+  color: #000000 !important;
+}
+
+
+.page-sub {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;
+  color: #000000 !important;
+  line-height: 1.6 !important;
+}
+
+
+.page-title,
+section.block h2 {
+  font-family: 'Inter', system-ui, sans-serif !important; /* Serif වෙනුවට Inter */
+  color: #000000 !important;
+}
+
+
+section.block > .sub {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;
+  color: #000000 !important;
+  line-height: 1.6 !important;
+}
+
+
+.step h4 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 17px !important;
+  font-weight: 600 !important;
+  color: #000000 !important;
+}
+
+.step p {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;
+  color: #000000 !important;
+  line-height: 1.6 !important;
+}
+
+
+.callout {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 1.6 !important;
+  color: #000000 !important;              
+  background: transparent !important;
+  border: 1.5px solid #D32F2F !important;
+  border-radius: 6px !important;
+  padding: 18px 20px !important;
+}
+
+
+.callout strong {
+  color: #000000 !important;
+}
+
+
+#metricToggle button {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14px !important;
+}
+
+#toggleNote {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  color: #000000 !important;
+}
+
+
+table.data-table th {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+table.data-table td {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;
+  color: #000000 !important;
+}
+
+
+.metric-highlight .m .lbl {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  color: #000000 !important;
+}
+  .timeline { counter-reset: step; margin: 0 0 48px 0; }
+  .step { display: grid; grid-template-columns: 44px 1fr; gap: 16px; padding-bottom: 22px; position: relative; }
+  .step:not(:last-child)::before { content: ''; position: absolute; left: 21px; top: 34px; bottom: 0; width: 1px; background: var(--line); }
+  .step .n { counter-increment: step; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--teal-deep); background: var(--teal-pale); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .step .n::before { content: counter(step); }
+  .step h4 { font-size: 15px; margin-bottom: 4px; }
+  .step p { font-size: 13.5px; color: var(--muted); margin: 0; max-width: 760px; }
+  section.block { margin-bottom: 56px; }
+  section.block h2 { font-size: 20px; margin-bottom: 6px; }
+  section.block > .sub { font-size: 13.5px; color: var(--muted); margin-bottom: 20px; max-width: var(--prose); }
+
+  .toggle-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+  .metric-highlight { display: flex; gap: 40px; flex-wrap: wrap; }
+  .metric-highlight .m .num { font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:600; color:var(--teal-deep); transition: color 0.3s ease; }
+  .metric-highlight .m .lbl { font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="wordmark">Kotmale <span>Reservoir Watch</span></div>
+  <div class="navlinks">
+    <a href="index.html">Overview</a>
+    <a href="predict.html">Predict</a>
+    <a href="entry.html">Data Entry</a>
+    <a href="model.html" class="active">Model &amp; Method</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="page-title serif">Model &amp; methodology</div>
+  <p class="page-sub">
+    How the forecasting model was built, tuned, compared, and evaluated — including the diagnostic
+    work behind its final reported accuracy.
+  </p>
+
+  <section class="block">
+    <h2 class="serif">Process</h2>
+    <div class="timeline">
+      <div class="step"><div class="n"></div><div><h4>Data audit</h4><p>Merged eleven catchment rainfall series with 26 years of daily storage; verified date continuity, checked for nulls, negatives, and out-of-range values.</p></div></div>
+      <div class="step"><div class="n"></div><div><h4>Duplicate resolution</h4><p>Found and removed an exact-duplicate catchment: Labukele and Hope Estate returned identical rainfall for all 25 years, traced to both sitting inside the same reanalysis grid cell (9.7 km apart).</p></div></div>
+      <div class="step"><div class="n"></div><div><h4>Resolution-shift documentation</h4><p>Identified a 2017 change in the underlying rainfall data's spatial resolution, collapsing ten catchments into three independent signals before that date. Flagged rather than discarded.</p></div></div>
+      <div class="step"><div class="n"></div><div><h4>Feature engineering</h4><p>Antecedent rainfall (3/7/14/30-day sums, decay-weighted index), storage momentum, seasonal encoding, and a statistically significant weekly cycle tied to hydropower release scheduling.</p></div></div>
+      <div class="step"><div class="n"></div><div><h4>Baseline model</h4><p>XGBoost gradient-boosted trees on the engineered features, time-based train/validation/test split, benchmarked against a naive persistence baseline.</p></div></div>
+      <div class="step"><div class="n"></div><div><h4>Tuning &amp; diagnosis</h4><p>Time-series cross-validated hyperparameter search plateaued around NSE 0.47–0.48. Residual analysis traced the ceiling to managed reservoir releases not present in the rainfall data.</p></div></div>
+      <div class="step"><div class="n"></div><div><h4>LSTM comparison</h4><p>A sequence model over the 30-day rainfall history, merged with same-day forecasted rainfall and reservoir state, outperformed the gradient-boosted baseline on validation.</p></div></div>
+      <div class="step"><div class="n"></div><div><h4>Test evaluation &amp; diagnosis</h4><p>One-time evaluation on the held-out 2024–2025 test set. Traced the majority of residual error to Cyclone Ditwah, November 2025 — see below.</p></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="serif">Architecture comparison</h2>
+    <p class="sub">Nash-Sutcliffe Efficiency (NSE) — the standard hydrological model evaluation metric. NSE &gt; 0.50 is conventionally considered a satisfactory simulation.</p>
+
+    <div class="toggle-row">
+      <div class="segmented" id="metricToggle">
+        <button class="active" data-mode="full">Full test set</button>
+        <button data-mode="excl">Excluding Ditwah window</button>
+      </div>
+      <span style="font-size:12.5px; color:var(--muted);" id="toggleNote">All 731 test days (2024–2025)</span>
+    </div>
+
+    <div class="metric-highlight panel" style="margin-bottom:20px;">
+      <div class="m"><span class="num" id="mNse">0.455</span><span class="lbl">NSE</span></div>
+      <div class="m"><span class="num" id="mRmse">2.54</span><span class="lbl">RMSE (MCM)</span></div>
+      <div class="m"><span class="num" id="mDays">731</span><span class="lbl">test days</span></div>
+    </div>
+
+    <table class="data-table">
+      <thead><tr><th>Model</th><th>Split</th><th class="num">RMSE (MCM)</th><th class="num">MAE (MCM)</th><th class="num">NSE</th></tr></thead>
+      <tbody>
+        <tr><td>Naive persistence</td><td>Validation</td><td class="num">2.17</td><td class="num">1.39</td><td class="num">0.00</td></tr>
+        <tr><td>XGBoost (untuned)</td><td>Validation</td><td class="num">1.59</td><td class="num">0.98</td><td class="num">0.467</td></tr>
+        <tr><td>XGBoost (tuned)</td><td>Validation</td><td class="num">1.56</td><td class="num">0.95</td><td class="num">0.483</td></tr>
+        <tr><td><strong>LSTM (final model)</strong></td><td>Validation</td><td class="num">1.48</td><td class="num">0.93</td><td class="num"><strong>0.534</strong></td></tr>
+        <tr><td><strong>LSTM (final model)</strong></td><td>Test (2024–2025)</td><td class="num">2.54</td><td class="num">1.07</td><td class="num"><strong>0.455</strong></td></tr>
+        <tr><td>LSTM, excl. 5 highest-error days</td><td>Test, 726 of 731 days</td><td class="num">1.35</td><td class="num">0.92</td><td class="num">0.626</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="block">
+    <h2 class="serif">What the test set was dominated by</h2>
+    <p class="sub">A small cluster of atypical days dominates the test-set error — not a systematic model weakness. Use the toggle above to see the difference directly.</p>
+    <div class="callout">
+      <strong>28 November 2025, Cyclone Ditwah.</strong> The model's largest single-day error
+      (predicted +15.9 MCM vs an actual +62.2 MCM rise) falls exactly on the landfall date of
+      Cyclone Ditwah, which brought Sri Lanka's most severe flooding in decades, with landslides
+      recorded specifically in Kotmale East, Nuwara Eliya District. This day and the two days either
+      side of it (27–29 November 2025) are 3 of the 5 highest-error days in the test set. Two further
+      high-error days elsewhere in the test period (4 August 2025 and 27 November 2024) are not
+      associated with this event and were not investigated further. Together these 5 days (0.7% of
+      731) account for 72% of total squared error; excluding them lifts test NSE from 0.455 to 0.626.
+    </div>
+  </section>
+
+  <section class="block">
+    <h2 class="serif">What drives the prediction</h2>
+    <p class="sub">Permutation feature importance, gradient-boosting benchmark model, validation set</p>
+    <canvas id="importanceChart" height="180"></canvas>
+  </section>
+
+  <section class="block">
+    <h2 class="serif">Limitations</h2>
+    <p class="sub" style="margin-bottom:0;">
+      Two factors bound this model's achievable accuracy, independent of architecture: managed
+      hydropower releases are not present in any available dataset and inject variance no
+      rainfall-only model can predict; and rainfall data before 2017 has materially coarser
+      spatial resolution than data from 2017 onward, limiting how much catchment-specific signal
+      the model could learn from sixteen of its twenty-six training years.
+    </p>
+  </section>
+</main>
+
+<!-- <footer class="site">
+  <span>Kotmale Reservoir Watch — final-year research project</span>
+  <span>Metric convention: Moriasi et al. (2007), hydrological model evaluation guidelines</span>
+</footer> -->
+
+<script src="common.js?v=2"></script>
+<script>
+const METRICS = {
+  full: { nse: "0.455", rmse: "2.54", days: "731", note: "All 731 test days (2024–2025)" },
+  excl: { nse: "0.626", rmse: "1.35", days: "726", note: "5 highest-error days removed" },
+};
+
+document.querySelectorAll("#metricToggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#metricToggle button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const m = METRICS[btn.dataset.mode];
+    ["mNse", "mRmse", "mDays"].forEach(id => document.getElementById(id).style.color = "var(--clay)");
+    setTimeout(() => {
+      document.getElementById("mNse").textContent = m.nse;
+      document.getElementById("mRmse").textContent = m.rmse;
+      document.getElementById("mDays").textContent = m.days;
+      document.getElementById("toggleNote").textContent = m.note;
+      ["mNse", "mRmse", "mDays"].forEach(id => document.getElementById(id).style.color = "var(--teal-deep)");
+    }, 150);
+  });
+});
+
+const ctx = document.getElementById("importanceChart");
+new Chart(ctx, {
+  type: "bar",
+  data: {
+    labels: ["Storage trend (momentum)", "3-day antecedent rainfall", "Talawakelle rainfall", "Seasonal position (day-of-year)", "Storage level, yesterday", "Storage level, 2 days prior", "Oonoogaloya rainfall", "Nuwara Eliya rainfall"],
+    datasets: [{ data: [0.5417, 0.0789, 0.0261, 0.0171, 0.0151, 0.0142, 0.0061, 0.0041], backgroundColor: "#1C5C5E", borderRadius: 2, barThickness: 18 }],
+  },
+  options: {
+    indexAxis: "y", responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { title: { display: true, text: "Permutation importance" }, grid: { color: "#EEF2EF" } },
+      y: { grid: { display: false }, ticks: { font: { size: 12.5 } } },
+    },
+  },
+});
+</script>
+
+</body>
+</html>

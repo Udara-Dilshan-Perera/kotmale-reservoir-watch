@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kotmale Reservoir Watch — Predict</title>
+<link rel="stylesheet" href="styles.css?v=2">
+<script src="vendor/chart.umd.min.js"></script>
+<script>window.Chart || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"><\/script>')</script>
+<style>
+
+
+.result-value {
+  font-family: 'Inter', system-ui, sans-serif !important; /* 'IBM Plex Mono' වෙනුවට පිරිසිදු modern sans-serif */
+  font-size: 40px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em;
+  color: var(--teal-deep) !important;
+  margin: 10px 0 4px 0 !important;
+}
+
+.result-value.negative {
+  color: var(--clay) !important;
+}
+
+
+.result-secondary div strong {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: var(--ink) !important;
+  margin-top: 4px;
+}
+
+
+.chain-actions {
+  margin-top: 20px;
+}
+
+.chain-btn {
+background-color: #0D3B3D !important; 
+  color: #FFFFFF !important;                              
+  border: none !important;
+  border-radius: 9999px !important;                       
+  padding: 12px 24px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(13, 59, 61, 0.2);
+  transition: all 0.2s ease-in-out;
+}
+
+.chain-btn:hover {
+  background: var(--teal-deep) !important;       
+  color: #FFFFFF !important;                    
+  box-shadow: 0 4px 12px rgba(28, 92, 94, 0.2);
+  transform: translateY(-1px);
+}
+
+ 
+.preset-row {
+  margin-bottom: 20px !important; 
+}
+
+
+.preset-note {
+  margin: 6px 0 16px 0 !important;
+}
+
+
+#rainFields {
+  margin-top: 16px !important;
+}
+
+
+.panel h3 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 20px !important;                             
+  font-weight: 600 !important;                            
+  color: var(--ink) !important;                           
+  letter-spacing: -0.01em;
+  margin-bottom: 6px !important;
+}
+
+
+.panel .sub {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;                            
+  font-weight: 400 !important;
+  color: #000000 !important;                           
+  margin-bottom: 18px !important;
+}
+
+
+.field label {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;                              
+  font-weight: 500 !important;                              
+  color: #334E4A !important;
+  margin-bottom: 6px !important;
+  display: block;
+}
+
+
+.field input[type="number"],
+.field input[type="date"] {
+  font-family: 'IBM Plex Mono', monospace !important;       
+  font-size: 14px !important;
+  border-radius: 8px !important;                          
+  border: 1px solid var(--line) !important;
+}
+
+
+button.primary,
+#submitBtn {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border-radius: 9999px !important;                        
+  padding: 12px 24px !important;
+  transition: all 0.2s ease;
+}
+
+
+#loadForecastBtn,
+button.secondary {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 9999px !important;                        
+  padding: 8px 18px !important;
+}
+
+
+.preset-btn {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 12.5px !important;
+  border-radius: 9999px !important;                       
+  padding: 6px 14px !important;
+}
+
+  .trend-title-block {
+  text-align: center;
+  margin-top: 48px;
+  margin-bottom: 20px;
+  padding-top: 50px;
+  padding-bottom: 25px;
+}
+
+.trend-title-block h3 {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--teal-deep);
+  margin: 0 0 6px 0;
+  text-shadow: none !important;
+}
+
+.trend-title-block .sub {
+  font-size: 16px;
+  color: var(--muted);
+  margin: 0;
+  text-shadow: none !important;
+}
+
+.chart-panel {
+  margin-top: 0 !important;
+  background: #FFFFFF !important;
+}
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-bottom: 18px; }
+  .date-row { padding-top: 16px; border-top: 1px solid var(--line); margin-bottom: 4px; }
+  .result-value { margin-top: 30px !important; margin-bottom: 10px !important; font-family: 'IBM Plex Mono', monospace; font-size: 42px; font-weight: 600; color: var(--teal-deep); margin: 6px 0 2px 0; }
+  .result-value.negative { color: var(--clay); }
+  .result-label { font-size: 16px; margin-bottom: 35px !important; color: #000000; }
+  .result-secondary { margin-top: 18px; padding-top: 22px !important; padding-top: 18px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; font-size: 13.5px; }
+  .result-secondary div strong { display: block; font-family: 'IBM Plex Mono', monospace; font-size: 17px; color: var(--ink); margin-top: 2px; }
+  .empty-state { color: var(--muted); font-size: 13.5px; padding: 30px 0; }
+  #statusLine { font-size: 16px; font-family: 'Inter', system-ui, sans-serif !important; color: #000000; margin-bottom: 32px; }
+  #statusLine strong { color: var(--ink); font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+  .chart-panel { margin-top: 24px; }
+  .preset-note { font-size: 12px; color: var(--muted); margin: -10px 0 16px 0; }
+  .blocked-note { margin-top: 12px; font-size: 13px; color: #6B3A1F; }
+  .blocked-note a { color: var(--teal-deep); font-weight: 600; }
+  .load-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chain-note {
+    margin-top: 16px; background: var(--clay-light); border: 1px solid #E3C6A6; border-radius: 3px;
+    padding: 12px 14px; font-size: 13px; color: #6B3A1F;
+  }
+  .chain-actions { display: flex; gap: 10px; margin-top: 50px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="wordmark">Kotmale <span>Reservoir Watch</span></div>
+  <div class="navlinks">
+    <a href="index.html">Overview</a>
+    <a href="predict.html" class="active">Predict</a>
+    <a href="entry.html">Data Entry</a>
+    <a href="model.html">Model &amp; Method</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="page-title serif">Predict tomorrow's storage change</div>
+  <p class="page-sub">
+    Enter forecasted rainfall for each catchment, load it from Open-Meteo, or start from a scenario
+    preset. Antecedent conditions are taken automatically from the recorded data.
+  </p>
+  <div id="statusLine">Loading system status…</div>
+  <div id="chainWarning" class="chain-note hidden"></div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h3>Forecasted rainfall</h3>
+      <p class="sub">Millimetres expected for each catchment on the target date</p>
+
+      <div class="load-row">
+        <button class="secondary" id="loadForecastBtn" type="button">Load from Open-Meteo</button>
+        <span class="info-note" id="loadNote" style="margin:0;"></span>
+      </div>
+
+      <div class="preset-row">
+        <button class="preset-btn" data-preset="typical">Typical Day</button>
+        <button class="preset-btn" data-preset="monsoon">Heavy Monsoon Day</button>
+        <button class="preset-btn extreme" data-preset="extreme">Extreme Event</button>
+      </div>
+      <p class="preset-note" id="presetNote"></p>
+
+      <div class="field-grid" id="rainFields"></div>
+      <div class="date-row field">
+        <label for="targetDate">Target date</label>
+        <input type="date" id="targetDate" readonly>
+      </div>
+      <button class="primary" id="submitBtn" style="width:100%; margin-top:16px;" disabled>Predict level change</button>
+      <div class="blocked-note hidden" id="blockedNote"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Prediction</h3>
+      <p class="sub">Reservoir storage change for the target date</p>
+      <div id="resultArea">
+        <div class="empty-state">Enter rainfall values and predict to see a result here.</div>
+      </div>
+    </div>
+  </div>
+
+ <div class="trend-title-block">
+  <h3>Recent storage trend</h3>
+  <p class="sub">Last 90 recorded days, plus the predicted next point</p>
+</div>
+
+
+<div class="panel chart-panel">
+  <canvas id="historyChart" height="80"></canvas>
+</div>
+</main>
+
+<!-- <footer class="site">
+  <span>Kotmale Reservoir Watch — final-year research project</span>
+  <span>Model: LSTM, test NSE 0.455 (0.623 excluding the Nov 2025 Cyclone Ditwah event) — see Model &amp; Method</span>
+</footer> -->
+
+<script src="common.js?v=2"></script>
+<script>
+const CATCHMENTS = [
+  ["ambewela_rain_mm", "Ambewela"], ["campion_estate_rain_mm", "Campion Estate"],
+  ["hellboda_north_rain_mm", "Hellboda North"], ["holmwood_estate_rain_mm", "Holmwood Estate"],
+  ["hope_estate_rain_mm", "Hope Estate"], ["nuwara_eliya_rain_mm", "Nuwara Eliya"],
+  ["oonoogaloya_estate_rain_mm", "Oonoogaloya"], ["sandrigham_rain_mm", "Sandrigham"],
+  ["talawakelle_rain_mm", "Talawakelle"], ["watawala_rain_mm", "Watawala"],
+];
+
+// Illustrative preset values, not literal historical records.
+const PRESETS = {
+  typical: { ambewela_rain_mm: 3, campion_estate_rain_mm: 4, hellboda_north_rain_mm: 4, holmwood_estate_rain_mm: 4, hope_estate_rain_mm: 3, nuwara_eliya_rain_mm: 3, oonoogaloya_estate_rain_mm: 6, sandrigham_rain_mm: 4, talawakelle_rain_mm: 5, watawala_rain_mm: 7 },
+  monsoon: { ambewela_rain_mm: 22, campion_estate_rain_mm: 28, hellboda_north_rain_mm: 30, holmwood_estate_rain_mm: 26, hope_estate_rain_mm: 22, nuwara_eliya_rain_mm: 20, oonoogaloya_estate_rain_mm: 45, sandrigham_rain_mm: 27, talawakelle_rain_mm: 34, watawala_rain_mm: 52 },
+  extreme: { ambewela_rain_mm: 95, campion_estate_rain_mm: 110, hellboda_north_rain_mm: 120, holmwood_estate_rain_mm: 105, hope_estate_rain_mm: 90, nuwara_eliya_rain_mm: 85, oonoogaloya_estate_rain_mm: 160, sandrigham_rain_mm: 115, talawakelle_rain_mm: 135, watawala_rain_mm: 190 },
+};
+const PRESET_NOTES = {
+  typical: "Illustrative low, uniform rainfall consistent with normal conditions.",
+  monsoon: "Illustrative elevated rainfall, heavier at the wettest catchments (Watawala, Oonoogaloya).",
+  extreme: "Illustrative extreme-scale rainfall, echoing the magnitude of the Nov 2025 Cyclone Ditwah event — not the literal recorded values.",
+};
+
+const $ = (id) => document.getElementById(id);
+let currentStatus = null;
+let chart;
+
+CATCHMENTS.forEach(([key, label]) => {
+  const div = document.createElement("div");
+  div.className = "field";
+  div.innerHTML = `<label for="${key}">${esc(label)} (mm)</label><input type="number" id="${key}" min="0" step="0.1" value="0">`;
+  $("rainFields").appendChild(div);
+});
+
+function fillRainfall(values) {
+  CATCHMENTS.forEach(([key]) => {
+    if (values[key] === undefined) return;
+    const input = $(key);
+    input.value = values[key];
+    input.classList.add("preset-filled");
+    setTimeout(() => input.classList.remove("preset-filled"), 600);
+  });
+}
+
+document.querySelectorAll(".preset-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".preset-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    fillRainfall(PRESETS[btn.dataset.preset]);
+    $("presetNote").textContent = PRESET_NOTES[btn.dataset.preset];
+  });
+});
+
+$("loadForecastBtn").addEventListener("click", async () => {
+  if (!currentStatus || !currentStatus.prediction_target) return;
+  $("loadNote").textContent = "Fetching…";
+  try {
+    const data = await apiGet("/openmeteo/rainfall?date=" + encodeURIComponent(currentStatus.prediction_target));
+    fillRainfall(data.rainfall);
+    document.querySelectorAll(".preset-btn").forEach((b) => b.classList.remove("active"));
+    $("presetNote").textContent = "";
+    const missing = Object.keys(data.unavailable).length;
+    $("loadNote").textContent = missing === 0
+      ? "Loaded for " + data.date + ". Review before predicting."
+      : "Loaded, but " + missing + " catchment(s) could not be retrieved and were left unchanged.";
+  } catch (e) {
+    $("loadNote").textContent = e.message;
+  }
+});
+
+function applyStatus(status, errorMessage) {
+  const btn = $("submitBtn"), note = $("blockedNote"), chainWarning = $("chainWarning");
+  note.classList.add("hidden");
+  if (!status) {
+    $("statusLine").innerHTML = `<span style="color:#8A2E2E">${esc(errorMessage)}</span>`;
+    btn.disabled = true;
+    chainWarning.classList.add("hidden");
+    return;
+  }
+  currentStatus = status;
+
+  if (status.chained_days_in_window > 0) {
+    chainWarning.textContent = `⚠ ${status.chained_days_in_window} of the last 30 days in this model's ` +
+      "history are simulated (chained) predictions, not real observations. Multi-day predictions like " +
+      "these have not been validated the way single-day predictions were, and errors compound at each step.";
+    chainWarning.classList.remove("hidden");
+  } else {
+    chainWarning.classList.add("hidden");
+  }
+  $("targetDate").value = status.prediction_target || "";
+  $("statusLine").innerHTML = `Last recorded day: <strong>${esc(status.last_recorded_date)}</strong> &nbsp;·&nbsp; ` +
+    `Predicting for: <strong>${esc(status.prediction_target)}</strong>`;
+
+  if (!status.ready) {
+    btn.disabled = true;
+    note.innerHTML = esc(status.message) + (status.can_record ? ` <a href="entry.html">Add the missing data →</a>` : "");
+    note.classList.remove("hidden");
+  } else if (!status.model_loaded) {
+    btn.disabled = true;
+    note.textContent = "The prediction model is not loaded: " + (status.model_error || "unknown error");
+    note.classList.remove("hidden");
+  } else {
+    btn.disabled = false;
+  }
+}
+
+async function loadHistory(predicted) {
+  try {
+    const history = await apiGet("/history?days=90");
+    renderChart(history, predicted);
+  } catch (e) { /* the status banner already reports connection problems */ }
+}
+
+function renderChart(history, predictedPoint) {
+  const labels = history.map((d) => d.date);
+  const values = history.map((d) => d.storage_mcm);
+  if (predictedPoint) labels.push(predictedPoint.date);
+  const predictedSeries = new Array(history.length - 1).fill(null);
+  if (predictedPoint) predictedSeries.push(history[history.length - 1].storage_mcm, predictedPoint.value);
+
+  if (chart) chart.destroy();
+  chart = new Chart($("historyChart"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        { label: "Recorded storage (MCM)", data: values, borderColor: "#1C5C5E", backgroundColor: "transparent", borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, pointHitRadius: 12, tension: 0.15 },
+        ...(predictedPoint ? [{ label: "Predicted", data: predictedSeries, borderColor: "#9C5330", borderDash: [5, 4], backgroundColor: "transparent", borderWidth: 2, pointRadius: 3, pointBackgroundColor: "#9C5330" }] : []),
+      ],
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: "nearest", intersect: false },
+      plugins: {
+        legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 12 } } },
+        tooltip: { backgroundColor: "#0D3B3D", padding: 10, cornerRadius: 3, callbacks: { label: (c) => c.dataset.label + ": " + c.parsed.y.toFixed(2) + " MCM" } },
+      },
+      scales: {
+        x: { ticks: { maxTicksLimit: 8, font: { size: 11 } }, grid: { display: false } },
+        y: { title: { display: true, text: "MCM" }, grid: { color: "#EEF2EF" } },
+      },
+    },
+  });
+}
+
+function accuracyBand(predicted, margin) {
+  const lo = predicted - margin, hi = predicted + margin;
+  const span = Math.max(Math.abs(lo), Math.abs(hi), 1) * 2;
+  const loPct = ((lo + span / 2) / span) * 100, hiPct = ((hi + span / 2) / span) * 100;
+  return `<div class="accuracy-band">
+    <div class="lbl"><span>typical error</span><span>±${margin.toFixed(1)} MCM (mean absolute error)</span></div>
+    <div class="track"><div class="range" style="left:${loPct}%; width:${hiPct - loPct}%;"></div><div class="center-mark" style="left:50%;"></div></div>
+  </div>`;
+}
+
+let lastForecastUsed = null;
+
+async function predict() {
+  const btn = $("submitBtn"), area = $("resultArea");
+  btn.disabled = true;
+  btn.textContent = "Predicting…";
+  const rainfall_forecast = {};
+  CATCHMENTS.forEach(([key]) => { rainfall_forecast[key] = parseFloat($(key).value || "0"); });
+
+  try {
+    const data = await apiSend("/predict", "POST", { target_date: $("targetDate").value, rainfall_forecast });
+    lastForecastUsed = rainfall_forecast;
+    const negative = data.predicted_delta_storage_mcm < 0;
+   const chainButton = currentStatus && currentStatus.demo_chain_available
+  ? `<div class="chain-actions">
+       <button id="acceptChainBtn" type="button" 
+               style="background-color: #0D3B3D !important; color: #FFFFFF !important; border: none !important; border-radius: 9999px !important; padding: 12px 24px !important; font-family: 'Inter', system-ui, sans-serif !important; font-size: 14px !important; font-weight: 600 !important; cursor: pointer !important; width: 100% !important; display: block !important;">
+         Use this as ${esc(data.target_date)}'s real record, predict the next day
+       </button>
+     </div>`
+  : "";
+    area.innerHTML = `
+  <div class="reveal-in">
+    <div class="result-value ${negative ? "negative" : ""}">${negative ? "" : "+"}${data.predicted_delta_storage_mcm} MCM</div>
+    <div class="result-label">Predicted change in storage for ${esc(data.target_date)}</div>
+    
+    <!-- accuracyBand පේළිය මෙතැනින් ඉවත් කර ඇත -->
+
+    <div class="result-secondary">
+      <div>Current storage<strong>${data.storage_lag1_mcm} MCM</strong></div>
+      <div>Predicted storage<strong>${data.predicted_storage_mcm} MCM</strong></div>
+    </div>
+    ${data.warning ? `<div class="warning-box">${esc(data.warning)}</div>` : ""}
+    ${chainButton}
+  </div>`;
+    if (currentStatus && currentStatus.demo_chain_available) {
+      $("acceptChainBtn").addEventListener("click", () => acceptChain(data));
+    }
+    loadHistory({ date: data.target_date, value: data.predicted_storage_mcm });
+  } catch (e) {
+    area.innerHTML = `<div class="error-box">${esc(e.message)}</div>`;
+  } finally {
+    btn.textContent = "Predict level change";
+    applyStatus(currentStatus);
+  }
+}
+
+async function acceptChain(predictedResult) {
+  const area = $("resultArea");
+  const acceptBtn = $("acceptChainBtn");
+  acceptBtn.disabled = true;
+  acceptBtn.textContent = "Recording…";
+  try {
+    const result = await apiSend("/demo/accept-prediction", "POST", {
+      storage_mcm: predictedResult.predicted_storage_mcm,
+      rainfall: lastForecastUsed,
+    });
+    currentStatus = result.status;
+    document.querySelectorAll(".preset-btn").forEach((b) => b.classList.remove("active"));
+    $("presetNote").textContent = "";
+    $("loadNote").textContent = "";
+    CATCHMENTS.forEach(([key]) => { $(key).value = 0; });
+    applyStatus(currentStatus);
+    area.innerHTML = `<div class="success-box">Recorded ${esc(result.date)} and advanced to it. ` +
+      `Ready to predict ${esc(currentStatus.prediction_target)} next.</div>`;
+    loadHistory(null);
+  } catch (e) {
+    acceptBtn.disabled = false;
+    acceptBtn.textContent = "Use this as the real record, then predict the next day →";
+    area.insertAdjacentHTML("beforeend", `<div class="error-box">${esc(e.message)}</div>`);
+  }
+}
+
+$("submitBtn").addEventListener("click", predict);
+
+(async function init() {
+  try { applyStatus(await getStatus()); }
+  catch (e) { applyStatus(null, e.message); }
+  loadHistory(null);
+})();
+</script>
+
+</body>
+</html>

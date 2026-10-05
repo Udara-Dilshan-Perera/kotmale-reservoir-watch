@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kotmale Reservoir Watch — Data Entry</title>
+<link rel="stylesheet" href="styles.css?v=2">
+<style>
+
+body {
+  background-color: #FFFFFF !important;
+}
+
+
+.panel h3 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  color: var(--ink, #122826) !important;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px !important;
+}
+
+
+.panel .sub {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;
+  line-height: 1.5;
+  color: #000000 !important;
+  margin-bottom: 20px !important;
+}
+
+
+.field label,
+.section-row h4 {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #334E4A !important;
+  margin-bottom: 6px !important;
+}
+
+
+.field input[type="text"],
+.field input[type="number"],
+.field input[type="date"],
+.field input[type="password"] {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-size: 14px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--line, #DCE5E2) !important;
+  padding: 9px 12px !important;
+}
+
+
+
+
+button.primary,
+#saveBtn {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  background-color: var(--teal-deep, #0D3B3D) !important;
+  color: #FFFFFF !important;
+  border: none !important;
+  border-radius: 9999px !important;            
+  padding: 12px 24px !important;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(13, 59, 61, 0.2);
+  transition: all 0.2s ease;
+}
+
+button.primary:hover:not(:disabled),
+#saveBtn:hover:not(:disabled) {
+  background-color: #144E50 !important;
+  transform: translateY(-1px);
+}
+
+
+button.secondary,
+#fetchBtn,
+#cancelEditBtn {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  border-radius: 9999px !important;            
+  padding: 7px 16px !important;
+  cursor: pointer;
+}
+
+
+table.data-table th {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: var(--muted, #5A736E) !important;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+table.data-table td {
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 16px !important;
+  color: var(--ink, #122826) !important;
+  padding: 10px 8px !important;
+}
+
+
+table.data-table td.num {
+  font-family: 'IBM Plex Mono', monospace !important;
+  font-weight: 600 !important;
+}
+
+
+table.data-table .badge {
+  border-radius: 9999px !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  font-size: 11.5px !important;
+  padding: 3px 8px !important;
+}
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+  .actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .actions .primary { flex: 1; min-width: 140px; }
+  table.data-table td.actions-cell { text-align: right; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="wordmark">Kotmale <span>Reservoir Watch</span></div>
+  <div class="navlinks">
+    <a href="index.html">Overview</a>
+    <a href="predict.html">Predict</a>
+    <a href="entry.html" class="active">Data Entry</a>
+    <a href="model.html">Model &amp; Method</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="page-title serif">Record the day's observations</div>
+  <p class="page-sub">
+    Enter the real reservoir storage and catchment rainfall for each day, one day at a time and in
+    order. The prediction tool uses these records as its history. Adding records does not retrain
+    the model.
+  </p>
+
+  <div class="grid2">
+    <div class="panel">
+      <h3 id="formTitle">New record</h3>
+      <p class="sub" id="formSub">Loading…</p>
+
+      <div class="field">
+        <label for="obsDate">Date</label>
+        <input type="date" id="obsDate" readonly>
+      </div>
+      <div class="field" style="margin-top:14px;">
+        <label for="storage">Reservoir storage (MCM)</label>
+        <input type="number" id="storage" step="0.001" min="0" placeholder="e.g. 114.123">
+      </div>
+
+      <div class="section-row">
+        <h4>Rainfall for the day (mm) - enter 0 for a dry catchment</h4>
+        <button class="secondary" id="fetchBtn" type="button">Fetch from Open-Meteo</button>
+      </div>
+      <div class="field-grid" id="rainFields"></div>
+      <p class="info-note" id="fetchNote"></p>
+
+      <div class="field hidden" id="pinRow" style="margin-top:14px;">
+        <label for="pin">Entry PIN</label>
+        <input type="password" id="pin" autocomplete="off">
+      </div>
+
+      <div id="confirmBox" class="warning-box hidden">
+        <div id="confirmText"></div>
+        <div class="actions">
+          <button class="secondary" id="confirmYes" type="button">Yes, the value is correct</button>
+          <button class="secondary" id="confirmNo" type="button">No, let me check it</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="saveBtn" type="button">Save record</button>
+        <button class="secondary hidden" id="cancelEditBtn" type="button">Cancel correction</button>
+      </div>
+      <div id="formMsg"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Recent records</h3>
+      <p class="sub">Most recent first. Only records entered here can be corrected, and only the latest one.</p>
+      <table class="data-table" id="recentTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th class="num">Storage (MCM)</th>
+            <th class="num">Rain (mm)</th>
+            <th>Source</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="recentBody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- <footer class="site">
+  <span>Kotmale Reservoir Watch — final-year research project</span>
+  <span>Records are stored locally in the application's database</span>
+</footer> -->
+
+<script src="common.js?v=2"></script>
+<script>
+const CATCHMENTS = [
+  ["ambewela_rain_mm", "Ambewela"], ["campion_estate_rain_mm", "Campion Estate"],
+  ["hellboda_north_rain_mm", "Hellboda North"], ["holmwood_estate_rain_mm", "Holmwood Estate"],
+  ["hope_estate_rain_mm", "Hope Estate"], ["nuwara_eliya_rain_mm", "Nuwara Eliya"],
+  ["oonoogaloya_estate_rain_mm", "Oonoogaloya"], ["sandrigham_rain_mm", "Sandrigham"],
+  ["talawakelle_rain_mm", "Talawakelle"], ["watawala_rain_mm", "Watawala"],
+];
+
+let status = null;
+let editMode = false;
+let fetchedFromOpenMeteo = false;
+let latestEditable = null;
+
+const el = (id) => document.getElementById(id);
+
+// Build the ten rainfall inputs. They start empty so a value must be entered deliberately.
+CATCHMENTS.forEach(([key, label]) => {
+  const div = document.createElement("div");
+  div.className = "field";
+  div.innerHTML = `<label for="${key}">${esc(label)}</label>` +
+    `<input type="number" id="${key}" min="0" step="0.1" placeholder="0.0">`;
+  el("rainFields").appendChild(div);
+  div.querySelector("input").addEventListener("input", () => { fetchedFromOpenMeteo = false; });
+});
+
+function message(kind, text) {
+  el("formMsg").innerHTML = text ? `<div class="${kind}-box">${esc(text)}</div>` : "";
+}
+
+function pinHeader() {
+  return status && status.entry_pin_required ? { "X-Entry-PIN": el("pin").value } : {};
+}
+
+function resetForm() {
+  editMode = false;
+  fetchedFromOpenMeteo = false;
+  el("storage").value = "";
+  CATCHMENTS.forEach(([key]) => { el(key).value = ""; });
+  el("confirmBox").classList.add("hidden");
+  el("cancelEditBtn").classList.add("hidden");
+  el("fetchNote").textContent = "";
+  applyStatus();
+}
+
+function applyStatus() {
+  if (!status) return;
+  el("pinRow").classList.toggle("hidden", !status.entry_pin_required);
+  if (editMode) return;
+  el("formTitle").textContent = "New record";
+  if (status.next_record_date) {
+    el("obsDate").value = status.next_record_date;
+    el("formSub").textContent = "The next date to record is " + status.next_record_date +
+      ". Enter the day's final storage reading and the rainfall for each catchment.";
+    setFormEnabled(true);
+  } else {
+    el("obsDate").value = "";
+    el("formSub").textContent = "No records exist yet, so a starting date cannot be determined.";
+    setFormEnabled(false);
+  }
+}
+
+function setFormEnabled(enabled) {
+  ["storage", "saveBtn", "fetchBtn"].forEach((id) => { el(id).disabled = !enabled; });
+  CATCHMENTS.forEach(([key]) => { el(key).disabled = !enabled; });
+}
+
+function readForm() {
+  const storageText = el("storage").value.trim();
+  if (storageText === "") return { error: "Enter the reservoir storage." };
+  const rainfall = {};
+  for (const [key, label] of CATCHMENTS) {
+    const text = el(key).value.trim();
+    if (text === "") return { error: "Enter rainfall for " + label + " (use 0 if it was dry)." };
+    rainfall[key] = parseFloat(text);
+  }
+  return {
+    payload: {
+      date: el("obsDate").value,
+      storage_mcm: parseFloat(storageText),
+      rainfall: rainfall,
+      source: fetchedFromOpenMeteo ? "open_meteo" : "manual",
+    },
+  };
+}
+
+async function save(confirmed) {
+  const form = readForm();
+  if (form.error) { message("error", form.error); return; }
+  form.payload.confirm_large_change = !!confirmed;
+
+  el("saveBtn").disabled = true;
+  message("", "");
+  try {
+    const result = await apiSend(editMode ? "/observations/latest" : "/observations",
+                                 editMode ? "PUT" : "POST", form.payload, pinHeader());
+    if (status && status.entry_pin_required) sessionStorage.setItem("kotmalePin", el("pin").value);
+    message("success", (editMode ? "Record corrected for " : "Record saved for ") + result.date + ".");
+    resetForm();
+    status = await getStatus(true);
+    applyStatus();
+    await loadRecent();
+    message("success", "Record saved for " + result.date + ".");
+  } catch (e) {
+    if (e.code === "NEEDS_CONFIRMATION") {
+      el("confirmText").textContent = e.message;
+      el("confirmBox").classList.remove("hidden");
+    } else {
+      message("error", e.message);
+    }
+  } finally {
+    el("saveBtn").disabled = !(status && (status.can_record || editMode));
+  }
+}
+
+el("saveBtn").addEventListener("click", () => save(false));
+el("confirmYes").addEventListener("click", () => { el("confirmBox").classList.add("hidden"); save(true); });
+el("confirmNo").addEventListener("click", () => el("confirmBox").classList.add("hidden"));
+el("cancelEditBtn").addEventListener("click", () => { resetForm(); message("", ""); });
+
+el("fetchBtn").addEventListener("click", async () => {
+  const date = el("obsDate").value;
+  el("fetchNote").textContent = "Fetching rainfall from Open-Meteo…";
+  try {
+    const data = await apiGet("/openmeteo/rainfall?date=" + encodeURIComponent(date));
+    CATCHMENTS.forEach(([key]) => {
+      if (data.rainfall[key] !== undefined) el(key).value = data.rainfall[key];
+    });
+    fetchedFromOpenMeteo = Object.keys(data.unavailable).length === 0;
+    const missing = Object.keys(data.unavailable);
+    el("fetchNote").textContent = missing.length === 0
+      ? "Filled from Open-Meteo for " + data.date + ". Please review the values before saving."
+      : "Filled from Open-Meteo, but " + missing.length + " catchment(s) could not be retrieved and were left blank. Enter them manually.";
+  } catch (e) {
+    el("fetchNote").textContent = e.message;
+  }
+});
+
+/* ------------------------------------------------------------ recent records */
+async function loadRecent() {
+  const body = el("recentBody");
+  try {
+    const records = await apiGet("/observations?days=14");
+    latestEditable = (records.length && records[0].source !== "historical_import") ? records[0] : null;
+    body.innerHTML = "";
+    records.forEach((r, index) => {
+      const tr = document.createElement("tr");
+      const cells = [
+        [r.date, ""], [r.storage_mcm.toFixed(2), "num"], [r.rain_total.toFixed(1), "num"],
+      ];
+      cells.forEach(([text, cls]) => {
+        const td = document.createElement("td");
+        td.textContent = text; if (cls) td.className = cls;
+        tr.appendChild(td);
+      });
+      const source = document.createElement("td");
+      source.innerHTML = `<span class="badge badge-${esc(r.source)}">${esc(r.source.replace("_", " "))}</span>`;
+      tr.appendChild(source);
+      const action = document.createElement("td");
+      action.className = "actions-cell";
+      if (index === 0 && latestEditable) {
+        const btn = document.createElement("button");
+        btn.className = "link-btn"; btn.textContent = "Correct";
+        btn.addEventListener("click", () => startCorrection(latestEditable));
+        action.appendChild(btn);
+      }
+      tr.appendChild(action);
+      body.appendChild(tr);
+    });
+  } catch (e) {
+    body.innerHTML = `<tr><td colspan="5">${esc(e.message)}</td></tr>`;
+  }
+}
+
+function startCorrection(record) {
+  editMode = true;
+  fetchedFromOpenMeteo = false;
+  el("formTitle").textContent = "Correct the latest record";
+  el("formSub").textContent = "Editing the record for " + record.date + ". Only the most recent record can be corrected.";
+  el("obsDate").value = record.date;
+  el("storage").value = record.storage_mcm;
+  CATCHMENTS.forEach(([key]) => { el(key).value = record.rainfall[key]; });
+  setFormEnabled(true);
+  el("cancelEditBtn").classList.remove("hidden");
+  el("saveBtn").disabled = false;
+  message("", "");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+(async function init() {
+  const saved = sessionStorage.getItem("kotmalePin");
+  if (saved) el("pin").value = saved;
+  try {
+    status = await getStatus();
+    applyStatus();
+  } catch (e) {
+    el("formSub").textContent = e.message;
+    setFormEnabled(false);
+  }
+  loadRecent();
+})();
+</script>
+
+</body>
+</html>

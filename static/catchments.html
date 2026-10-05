@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kotmale Reservoir Watch — Catchments</title>
+<link rel="stylesheet" href="styles.css?v=2">
+<style>
+  .cluster-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 44px; }
+  @media (max-width: 780px) { .cluster-wrap { grid-template-columns: 1fr; } }
+  .cluster-col h4 { font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 14px; }
+  .cluster-box { border-radius: 3px; padding: 14px 16px; margin-bottom: 10px; border-left: 3px solid; }
+  .cluster-box .members { font-size: 13px; margin-top: 6px; line-height: 1.7; }
+  .cluster-box .count { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); }
+  .cA { background: var(--teal-pale); border-color: var(--teal); }
+  .cB { background: var(--moss-light); border-color: var(--moss); }
+  .cC { background: var(--clay-light); border-color: var(--clay); }
+  .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip.cA { border-left-color: var(--teal); }
+  .chip.cB { border-left-color: var(--moss); }
+  .chip.cC { border-left-color: var(--clay); }
+  .chip.selected.cA, .chip.selected.cB, .chip.selected.cC { background: var(--teal-deep); border-left-color: var(--teal-deep); }
+  .note-inline { font-size: 13px; color: var(--muted); margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="wordmark">Kotmale <span>Reservoir Watch</span></div>
+  <div class="navlinks">
+    <a href="index.html">Overview</a>
+    <a href="predict.html">Predict</a>
+    <a href="entry.html">Data Entry</a>
+    <a href="catchments.html" class="active">Catchments</a>
+    <a href="model.html">Model &amp; Method</a>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="page-title serif">Ten catchments, one highland basin</div>
+  <p class="page-sub">
+    The Kotmale Reservoir draws from catchments across the central highlands tea country
+    surrounding Nuwara Eliya. Eleven stations were originally sourced; one — Labukele — was
+    excluded after being found identical to Hope Estate across all 25 years of record
+    (9.7 km apart, both inside the same ~25 km reanalysis grid cell). Click a catchment below
+    to highlight it in the table.
+  </p>
+
+  <div class="panel" style="margin-bottom:48px;">
+    <h3>A resolution finding specific to this dataset</h3>
+    <p class="sub">
+      Rainfall before 2017 came from a coarser ~25 km reanalysis grid than the ~9 km grid used
+      from 2017 onward. Catchments within the same grid cell returned identical daily values
+      pre-2017 — three underlying signals wearing ten name tags — before separating into fully
+      independent readings from 2017.
+    </p>
+    <div class="cluster-wrap">
+      <div class="cluster-col">
+        <h4>Before 2017 — 3 independent signals</h4>
+        <div class="cluster-box cA"><span class="count">5 stations, 1 signal</span>
+          <div class="members">Ambewela · Hellboda North · Hope Estate · Nuwara Eliya · Talawakelle</div></div>
+        <div class="cluster-box cB"><span class="count">3 stations, 1 signal</span>
+          <div class="members">Campion Estate · Holmwood Estate · Sandrigham</div></div>
+        <div class="cluster-box cC"><span class="count">2 stations, 1 signal</span>
+          <div class="members">Oonoogaloya · Watawala</div></div>
+      </div>
+      <div class="cluster-col">
+        <h4>From 2017 — 10 independent signals (click to highlight)</h4>
+        <div class="chip-grid" id="chipGrid"></div>
+        <p class="note-inline">Colour indicates which pre-2017 cluster each catchment belonged to.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Catchment rainfall profile</h3>
+    <p class="sub">Mean annual total rainfall, 2000–2025, computed from the historical record. Click a column header to sort.</p>
+    <table class="data-table" id="catchTable">
+      <thead>
+        <tr>
+          <th class="sortable" data-key="name" data-type="text">Catchment <span class="arrow">↕</span></th>
+          <th data-key="cluster">Pre-2017 cluster</th>
+          <th class="sortable num" data-key="rainfall" data-type="num">Mean annual rainfall <span class="arrow">↕</span></th>
+        </tr>
+      </thead>
+      <tbody id="catchTbody"></tbody>
+    </table>
+    <p class="note-inline">
+      Watawala and Oonoogaloya, the wettest catchments, sit on windward-facing slopes typical of
+      the southwestern highland escarpment; Ambewela, the driest, lies in the higher, more
+      sheltered plateau near Sri Lanka's coldest recorded weather station.
+    </p>
+  </div>
+</main>
+
+<footer class="site">
+  <span>Kotmale Reservoir Watch — final-year research project</span>
+  <span>Rainfall data: Open-Meteo historical archive (ERA5 / ERA5-Land / ECMWF IFS)</span>
+</footer>
+
+<script src="common.js?v=2"></script>
+<script>
+const DATA = [
+  { name: "Watawala", cluster: "C", rainfall: 4178 },
+  { name: "Oonoogaloya", cluster: "C", rainfall: 3967 },
+  { name: "Talawakelle", cluster: "A", rainfall: 3044 },
+  { name: "Holmwood Estate", cluster: "B", rainfall: 2849 },
+  { name: "Campion Estate", cluster: "B", rainfall: 2802 },
+  { name: "Sandrigham", cluster: "B", rainfall: 2614 },
+  { name: "Hellboda North", cluster: "A", rainfall: 2584 },
+  { name: "Nuwara Eliya", cluster: "A", rainfall: 2493 },
+  { name: "Hope Estate", cluster: "A", rainfall: 2426 },
+  { name: "Ambewela", cluster: "A", rainfall: 2301 },
+];
+const CLUSTER_LABEL = { A: "Cluster A", B: "Cluster B", C: "Cluster C" };
+const CLUSTER_STYLE = {
+  A: "background:var(--teal-pale);color:var(--teal);",
+  B: "background:var(--moss-light);color:var(--moss);",
+  C: "background:var(--clay-light);color:var(--clay);",
+};
+
+const chipGrid = document.getElementById("chipGrid");
+DATA.forEach(d => {
+  const chip = document.createElement("span");
+  chip.className = `chip c${d.cluster}`;
+  chip.textContent = d.name;
+  chip.dataset.name = d.name;
+  chip.addEventListener("click", () => toggleHighlight(d.name));
+  chipGrid.appendChild(chip);
+});
+
+let sortState = { key: "rainfall", dir: "desc" };
+let selectedName = null;
+
+function renderTable() {
+  const sorted = [...DATA].sort((a, b) => {
+    const dir = sortState.dir === "asc" ? 1 : -1;
+    if (sortState.key === "name") return a.name.localeCompare(b.name) * dir;
+    return (a.rainfall - b.rainfall) * dir;
+  });
+  const tbody = document.getElementById("catchTbody");
+  tbody.innerHTML = sorted.map(d => `
+    <tr data-name="${d.name}" class="${d.name === selectedName ? 'highlighted' : ''}">
+      <td>${d.name}</td>
+      <td><span class="tag" style="${CLUSTER_STYLE[d.cluster]}">${CLUSTER_LABEL[d.cluster]}</span></td>
+      <td class="num">${d.rainfall.toLocaleString()} mm</td>
+    </tr>
+  `).join("");
+
+  document.querySelectorAll("#catchTable th.sortable").forEach(th => {
+    th.classList.toggle("sorted", th.dataset.key === sortState.key);
+    th.querySelector(".arrow").textContent = th.dataset.key === sortState.key ? (sortState.dir === "asc" ? "↑" : "↓") : "↕";
+  });
+}
+
+function toggleHighlight(name) {
+  selectedName = (selectedName === name) ? null : name;
+  document.querySelectorAll(".chip").forEach(c => c.classList.toggle("selected", c.dataset.name === selectedName));
+  renderTable();
+  if (selectedName) {
+    const row = document.querySelector(`#catchTbody tr[data-name="${selectedName}"]`);
+    if (row) row.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}
+
+document.querySelectorAll("#catchTable th.sortable").forEach(th => {
+  th.addEventListener("click", () => {
+    if (sortState.key === th.dataset.key) {
+      sortState.dir = sortState.dir === "asc" ? "desc" : "asc";
+    } else {
+      sortState = { key: th.dataset.key, dir: "desc" };
+    }
+    renderTable();
+  });
+});
+
+document.getElementById("catchTbody").addEventListener("click", (e) => {
+  const row = e.target.closest("tr");
+  if (row) toggleHighlight(row.dataset.name);
+});
+
+renderTable();
+</script>
+
+</body>
+</html>
